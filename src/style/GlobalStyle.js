@@ -47,25 +47,25 @@ const GlobalStyle = createGlobalStyle`
 
 	*{
 		box-sizing: border-box;
-		--cor-fundo: #FB6B6B;
-		--cor-fundo-card: #FFFFD4;
-		--cor-nao-lembrei: #FF3030;
-		--cor-quase-nao-lembrei: #FF922E;
-		--cor-zap: #2FBE34;
-		--preto: #333333;
+		
 	}
 
 	body {
-		background-color: #fb6b6b;
 		width: 100vw;
 		height: 100vh;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		color: #333333;
-		font-family: 'Recursive', sans-serif;
-		/* font-family: 'Righteous', cursive; */
+		background-color: #E5E5E5;
+		margin-top: 70px;
+		font-family: 'Roboto', sans-serif;
+		font-weight: 400;
+		a{
+		text-decoration: none;
+		}
+		a:visited{
+		color: inherit;
+		}
 	}
+
+	
 `;
 
 export default GlobalStyle;

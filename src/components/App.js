@@ -11,7 +11,7 @@ export default function App() {
 		<BrowserRouter>
 			<GlobalStyle />
 			<MainHeader>
-				<p>Header</p>
+				<p>CINEFLIX</p>
 			</MainHeader>
 
 			<Routes>
@@ -25,8 +25,17 @@ export default function App() {
 }
 
 const MainHeader = styled.div`
+	background-color: #c3cfd9;
 	position: fixed;
 	top: 0;
-	color: #ffffff;
-	background-color: #000000;
+	left: 0;
+	height: 70px;
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: #e8833a;
+	font-weight: 400;
+	font-size: 34px;
+	text-align: center;
 `;
