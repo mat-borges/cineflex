@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 export default function SelectTime() {
 	return (
 		<div className="select-time">
@@ -20,6 +22,9 @@ export default function SelectTime() {
 				<p>Imagem</p>
 				<p>Ttitulo</p>
 			</div>
+			<Link to="/select_seat">
+				<button>Ir para próxima página</button>
+			</Link>
 		</div>
 	);
 }

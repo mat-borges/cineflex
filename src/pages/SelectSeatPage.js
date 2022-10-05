@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 export default function SelectSeat() {
 	return (
 		<div className="select-seat">
@@ -24,6 +26,9 @@ export default function SelectSeat() {
 					<p>Horario</p>
 				</div>
 			</div>
+			<Link to="/finish_order">
+				<button>Ir para próxima página</button>
+			</Link>
 		</div>
 	);
 }

@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 export default function FinishOrder() {
 	return (
 		<div className="finish-order">
@@ -10,7 +12,9 @@ export default function FinishOrder() {
 			<h1>Comprador</h1>
 			<p>nome</p>
 			<p>cpf</p>
-			<button>Voltar para home</button>
+			<Link to="/">
+				<button>Voltar para home</button>
+			</Link>
 		</div>
 	);
 }
