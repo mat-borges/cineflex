@@ -1,22 +1,25 @@
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { movies, seats, times } from '../mock.js';
 
-export default function FinishOrder() {
+export default function FinishOrder({ selectedMovie }) {
+	console.log(selectedMovie);
 	return (
 		<FinishOrderBox>
 			<h1>Pedido feito com sucesso!</h1>
 			<TicketsSummary>
 				<h2>Filmes e sessões</h2>
-				<p>{movies[0].title}</p>
+				<p>{selectedMovie.movie.title}</p>
 				<p>
-					{times.days[0].date} {times.days[0].showtimes[0].name}
+					{selectedMovie.day.date} {selectedMovie.day.time}
 				</p>
 				<h2>Ingressos</h2>
-				<p>Assento {seats.seats[0].name}</p>
+				{selectedMovie.seats.seats.map((e) => (
+					<p>Assento {e}</p>
+				))}
+
 				<h2>Comprador</h2>
-				<p>Mateus</p>
-				<p>000.000.000-0</p>
+				<p>{selectedMovie.seats.name}</p>
+				<p>{selectedMovie.seats.cpf}</p>
 			</TicketsSummary>
 
 			<Link to="/">

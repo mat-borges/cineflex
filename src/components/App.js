@@ -8,7 +8,12 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { useState } from 'react';
 
 export default function App() {
-	const [moviesList, setMoviesList] = useState([]);
+	const [selectedMovie, setSelectedMovie] = useState({
+		movie: {},
+		day: { weekday: '', date: '', time: '' },
+		seats: { seats: [], ids: [], name: '', cpf: '' },
+	});
+
 	return (
 		<BrowserRouter>
 			<GlobalStyle />
@@ -19,11 +24,23 @@ export default function App() {
 			<Routes>
 				<Route
 					path="/"
-					element={<SelectMoviePage moviesList={moviesList} setMoviesList={setMoviesList} />}
+					element={
+						<SelectMoviePage selectedMovie={selectedMovie} setSelectedMovie={setSelectedMovie} />
+					}
 				/>
-				<Route path="/select_time" element={<SelectTimePage moviesList={moviesList} />} />
-				<Route path="/select_seat" element={<SelectSeatPage moviesList={moviesList} />} />
-				<Route path="/finish_order" element={<FinishOrderPage />} />
+				<Route
+					path="/:movieID/select_time"
+					element={
+						<SelectTimePage selectedMovie={selectedMovie} setSelectedMovie={setSelectedMovie} />
+					}
+				/>
+				<Route
+					path="/:timeID/select_seat"
+					element={
+						<SelectSeatPage selectedMovie={selectedMovie} setSelectedMovie={setSelectedMovie} />
+					}
+				/>
+				<Route path="/finish_order" element={<FinishOrderPage selectedMovie={selectedMovie} />} />
 			</Routes>
 		</BrowserRouter>
 	);

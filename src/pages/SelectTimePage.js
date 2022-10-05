@@ -1,14 +1,19 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import PageFooter from '../components/PageFooter';
+import backIcon from '../assets/arrow-back-outline.png';
 
-export default function SelectTime({ moviesList }) {
+export default function SelectTime(props) {
 	const [timesList, setTimesList] = useState([]);
+	const { selectedMovie, setSelectedMovie } = props;
+	const { movieID } = useParams();
 
 	useEffect(() => {
-		const request = axios.get('https://mock-api.driven.com.br/api/v5/cineflex/movies/1/showtimes');
+		const request = axios.get(
+			`https://mock-api.driven.com.br/api/v5/cineflex/movies/${movieID}/showtimes`
+		);
 
 		request.then((promise) => {
 			setTimesList(promise.data.days);
@@ -17,12 +22,23 @@ export default function SelectTime({ moviesList }) {
 		request.catch((erro) => {
 			console.log(erro.response.data);
 		});
-	}, []);
+	}, [movieID]);
 
-	console.log(timesList);
+	function chooseTime(day, time) {
+		let newSelectedMovie = { ...selectedMovie };
+		newSelectedMovie.day.weekday = day.weekday;
+		newSelectedMovie.day.date = day.date;
+		newSelectedMovie.day.time = time.name;
+		setSelectedMovie(newSelectedMovie);
+	}
+
 	return (
 		<SelectTimeBox>
-			<h1>Selecione o horário</h1>
+			<h1>
+				<Icon src={backIcon} alt="backIcon" />
+				Selecione o horário
+			</h1>
+
 			<DatesList>
 				{timesList.map((day, i) => (
 					<li key={day.id}>
@@ -31,8 +47,8 @@ export default function SelectTime({ moviesList }) {
 						</h2>
 						<TimesList>
 							{timesList[i].showtimes.map((time) => (
-								<Link to="/select_seat" key={time.id}>
-									<li>{time.name}</li>
+								<Link to={`/${time.id}/select_seat`} key={time.id}>
+									<li onClick={() => chooseTime(day, time)}>{time.name}</li>
 								</Link>
 							))}
 						</TimesList>
@@ -40,8 +56,8 @@ export default function SelectTime({ moviesList }) {
 				))}
 			</DatesList>
 
-			<PageFooter src={moviesList[0].posterURL} alt={moviesList[0].title}>
-				<p>Wakanda Forever</p>
+			<PageFooter src={selectedMovie.movie.posterURL} alt={selectedMovie.movie.title}>
+				<p>{selectedMovie.movie.title}</p>
 			</PageFooter>
 		</SelectTimeBox>
 	);
@@ -83,4 +99,10 @@ const TimesList = styled.ul`
 		margin: 0 10px 10px 0;
 		color: #ffffff;
 	}
+`;
+
+const Icon = styled.img`
+	width: 25px;
+	height: 25px;
+	margin-right: 20px;
 `;

@@ -1,14 +1,23 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import PageFooter from '../components/PageFooter';
+import backIcon from '../assets/arrow-back-outline.png';
 
-export default function SelectSeat({ moviesList }) {
+export default function SelectSeat(props) {
+	const { selectedMovie, setSelectedMovie } = props;
+	const { timeID } = useParams();
 	const [seatsList, setSeatsList] = useState([]);
+	const [seats, setSeats] = useState([]);
+	const [seatID, setSeatID] = useState([]);
+	const [buyer, setBuyer] = useState('');
+	const [cpf, setCPF] = useState('');
 
 	useEffect(() => {
-		const request = axios.get('https://mock-api.driven.com.br/api/v5/cineflex/showtimes/10/seats');
+		const request = axios.get(
+			`https://mock-api.driven.com.br/api/v5/cineflex/showtimes/${timeID}/seats`
+		);
 
 		request.then((promise) => {
 			setSeatsList(promise.data.seats);
@@ -17,18 +26,90 @@ export default function SelectSeat({ moviesList }) {
 		request.catch((erro) => {
 			console.log(erro.response.data);
 		});
-	}, []);
+	}, [timeID]);
+
+	function chooseSeats() {
+		let newSelectedMovie = { ...selectedMovie };
+
+		if (seats.length !== 0 && buyer !== '' && cpf !== '') {
+			newSelectedMovie.seats.seats = [...seats];
+			newSelectedMovie.seats.ids = [...seatID];
+			newSelectedMovie.seats.name = buyer;
+			newSelectedMovie.seats.cpf = cpf;
+			setSelectedMovie(newSelectedMovie);
+		} else {
+			if (seats.length === 0) {
+				alert('Você precisa selecionar pelo menos 1 assento');
+			}
+			if (buyer === '') {
+				alert('Você precisa inserir um nome válido');
+			}
+			if (cpf === '') {
+				alert('Você precisa inserir um CPF válido');
+			}
+		}
+	}
+
+	function changeSeats(number, id) {
+		let newSeats = [...seats];
+		let newSeatsID = [...seatID];
+
+		if (!seats.includes(number)) {
+			newSeats.push(number);
+			newSeatsID.push(id);
+			setSeats(newSeats);
+			setSeatID(newSeatsID);
+		} else {
+			newSeatsID = newSeatsID.filter((e) => e !== id);
+			newSeats = newSeats.filter((e) => e !== number);
+			setSeats(newSeats);
+			setSeatID(newSeatsID);
+		}
+	}
+
+	function checkBackColor(seat) {
+		let color;
+		if (seat.isAvailable) {
+			color = '#c3cfd9';
+		} else {
+			color = '#FBE192';
+		}
+		if (seat.isAvailable && seats.includes(seat.name)) {
+			color = '#1AAE9E';
+		}
+		return color;
+	}
+
+	function checkBorderColor(seat) {
+		let color;
+		if (seat.isAvailable) {
+			color = '#808f9d';
+		} else {
+			color = '#F7C52B';
+		}
+		if (seat.isAvailable && seats.includes(seat.name)) {
+			color = '#0E7D71';
+		}
+		return color;
+	}
+
 	return (
 		<SelectSeatBox>
-			<h1>Selecione o(s) assento(s)</h1>
+			<h1>
+				<Icon src={backIcon} alt="backIcon" />
+				Selecione o(s) assento(s)
+			</h1>
+
 			<SeatList>
 				{seatsList.map((seat) => (
 					<Seat
+						type="button"
+						value={seat.name}
 						key={seat.id}
-						backColor={seat.isAvailable ? '#c3cfd9' : '#FBE192'}
-						borderColor={seat.isAvailable ? '#808f9d' : '#F7C52B'}>
-						{seat.name}
-					</Seat>
+						backColor={checkBackColor(seat)}
+						borderColor={checkBorderColor(seat)}
+						onClick={() => changeSeats(seat.name, seat.id)}
+					/>
 				))}
 			</SeatList>
 
@@ -49,22 +130,30 @@ export default function SelectSeat({ moviesList }) {
 
 			<Inputs>
 				<h2>Nome do comprador</h2>
-				<input type="text" placeholder="Digite seu nome..." />
+				<input
+					type="text"
+					placeholder="Digite seu nome..."
+					onChange={(e) => setBuyer(e.target.value)}
+				/>
 				<h2>CPF</h2>
 				<input
 					type="text"
 					placeholder="Digite seu CPF..."
 					pattern="(\d{3}\.?\d{3}\.?\d{3}-?\d{2})|(\d{2}\.?\d{3}\.?\d{3}/?\d{4}-?\d{2})"
+					onChange={(e) => setCPF(e.target.value)}
 				/>
 			</Inputs>
+
 			<Link to="/finish_order">
-				{/* O axios.post() tem que ser colocado nesse submit*/}
-				<input type="submit" value="Reservar assento(s)" />{' '}
+				<input type="submit" value="Reservar assento(s)" onClick={() => chooseSeats()} />
 			</Link>
 
-			<PageFooter src={moviesList[0].posterURL} alt={moviesList[0].title}>
-				<p>Wakanda Forever</p>
-				<p>Segunda-Feira - 15:00</p>
+			<PageFooter src={selectedMovie.movie.posterURL} alt={selectedMovie.movie.title}>
+				<p>{selectedMovie.movie.title}</p>
+				<p>{selectedMovie.day.date}</p>
+				<p>
+					{selectedMovie.day.weekday} - {selectedMovie.day.time}
+				</p>
 			</PageFooter>
 		</SelectSeatBox>
 	);
@@ -108,7 +197,7 @@ const SeatList = styled.div`
 	margin: 0 5px;
 `;
 
-const Seat = styled.div`
+const Seat = styled.input`
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -173,4 +262,10 @@ const Inputs = styled.div`
 			font-style: italic;
 		}
 	}
+`;
+
+const Icon = styled.img`
+	width: 25px;
+	height: 25px;
+	margin-right: 20px;
 `;

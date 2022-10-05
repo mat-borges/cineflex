@@ -1,7 +1,6 @@
 import styled from 'styled-components';
 
 export default function PageFooter({ src, alt, children }) {
-	console.log(children);
 	return (
 		<PageFooterBox>
 			<img src={src} alt={alt} />
@@ -32,7 +31,7 @@ const PageFooterBox = styled.div`
 		justify-content: center;
 		align-items: flex-start;
 		p {
-			font-size: 26px;
+			font-size: 23px;
 			line-height: 30px;
 			font-weight: 400;
 			word-break: break-all;
