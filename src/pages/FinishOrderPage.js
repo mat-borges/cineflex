@@ -31,7 +31,7 @@ const FinishOrderBox = styled.div`
 	flex-direction: column;
 	align-items: center;
 	h1 {
-		margin: 40px 0 25px 0;
+		margin: 40px 20px 20px; /* top (left/right) bottom*/
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -39,6 +39,8 @@ const FinishOrderBox = styled.div`
 		font-size: 24px;
 		font-weight: 700;
 		letter-spacing: 2px;
+		line-height: 28px;
+		color: #247a6b;
 	}
 	button {
 		width: 225px;
@@ -50,6 +52,7 @@ const FinishOrderBox = styled.div`
 		font-size: 18px;
 		color: #ffffff;
 		text-align: center;
+		cursor: pointer;
 	}
 `;
 

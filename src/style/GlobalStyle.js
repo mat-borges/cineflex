@@ -52,13 +52,13 @@ const GlobalStyle = createGlobalStyle`
 
 	body {
 		width: 100vw;
-		height: 100vh;
 		background-color: #E5E5E5;
 		margin-top: 70px;
 		font-family: 'Roboto', sans-serif;
 		font-weight: 400;
 		a{
 		text-decoration: none;
+		/* color: inherit; */
 		}
 		a:visited{
 		color: inherit;

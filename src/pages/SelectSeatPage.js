@@ -1,19 +1,33 @@
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { seats } from '../mock';
+import PageFooter from '../components/PageFooter';
 
-export default function SelectSeat() {
-	const seatsList = seats.seats;
+export default function SelectSeat({ moviesList }) {
+	const [seatsList, setSeatsList] = useState([]);
+
+	useEffect(() => {
+		const request = axios.get('https://mock-api.driven.com.br/api/v5/cineflex/showtimes/10/seats');
+
+		request.then((promise) => {
+			setSeatsList(promise.data.seats);
+		});
+
+		request.catch((erro) => {
+			console.log(erro.response.data);
+		});
+	}, []);
 	return (
 		<SelectSeatBox>
 			<h1>Selecione o(s) assento(s)</h1>
 			<SeatList>
-				{seatsList.map((e) => (
+				{seatsList.map((seat) => (
 					<Seat
-						key={e.id}
-						backColor={e.isAvailable ? '#c3cfd9' : '#FBE192'}
-						borderColor={e.isAvailable ? '#808f9d' : '#F7C52B'}>
-						{e.name}
+						key={seat.id}
+						backColor={seat.isAvailable ? '#c3cfd9' : '#FBE192'}
+						borderColor={seat.isAvailable ? '#808f9d' : '#F7C52B'}>
+						{seat.name}
 					</Seat>
 				))}
 			</SeatList>
@@ -44,18 +58,13 @@ export default function SelectSeat() {
 				/>
 			</Inputs>
 			<Link to="/finish_order">
-				<input type="submit" value="Reservar assento(s)" />
+				{/* O axios.post() tem que ser colocado nesse submit*/}
+				<input type="submit" value="Reservar assento(s)" />{' '}
 			</Link>
 
-			<PageFooter>
-				<img
-					src="https://mundoconectado.com.br/uploads/2022/10/03/28762/fejztbixoamd00qjfif.jpg"
-					alt="movie"
-				/>
-				<div>
-					<p>Wakanda Forever</p>
-					<p>Segunda-Feira - 15:00</p>
-				</div>
+			<PageFooter src={moviesList[0].posterURL} alt={moviesList[0].title}>
+				<p>Wakanda Forever</p>
+				<p>Segunda-Feira - 15:00</p>
 			</PageFooter>
 		</SelectSeatBox>
 	);
@@ -86,6 +95,7 @@ const SelectSeatBox = styled.div`
 		font-size: 18px;
 		color: #ffffff;
 		text-align: center;
+		cursor: pointer;
 	}
 `;
 
@@ -94,6 +104,7 @@ const SeatList = styled.div`
 	flex-wrap: wrap;
 	align-items: center;
 	justify-content: center;
+	max-width: 365px;
 	margin: 0 5px;
 `;
 
@@ -115,6 +126,11 @@ const Seat = styled.div`
 	:active {
 		filter: brightness(1.1);
 	}
+	@media (min-width: 700px) {
+		width: 30px;
+		height: 30px;
+		font-size: 18px;
+	}
 `;
 
 const StatusLabels = styled.div`
@@ -133,6 +149,7 @@ const StatusLabels = styled.div`
 
 const SeatStatus = styled(Seat)`
 	margin: 0 0 5px 0;
+	cursor: inherit;
 	&:hover,
 	:active {
 		filter: brightness(1);
@@ -146,7 +163,6 @@ const Inputs = styled.div`
 		margin-left: 24px;
 		font-size: 18px;
 		line-height: 21px;
-		align-items: flex-start;
 	}
 	input[type='text'] {
 		width: 90%;
@@ -155,37 +171,6 @@ const Inputs = styled.div`
 		margin: 3px auto 7px 24px;
 		::placeholder {
 			font-style: italic;
-		}
-	}
-`;
-
-const PageFooter = styled.div`
-	position: fixed;
-	bottom: 0;
-	left: 0;
-	display: flex;
-	align-items: center;
-	background-color: #dfe6ed;
-	height: 115px;
-	width: 100%;
-	border: 1px solid #9eadba;
-	img {
-		background-color: #ffffff;
-		padding: 8px;
-		height: 90px;
-		margin: 0 10px;
-	}
-	div {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: flex-start;
-		p {
-			font-size: 26px;
-			line-height: 30px;
-			font-weight: 400;
-			word-break: break-all;
-			hyphens: auto;
 		}
 	}
 `;

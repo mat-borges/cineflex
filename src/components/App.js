@@ -5,8 +5,10 @@ import SelectSeatPage from '../pages/SelectSeatPage.js';
 import SelectTimePage from '../pages/SelectTimePage.js';
 import GlobalStyle from '../style/GlobalStyle.js';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { useState } from 'react';
 
 export default function App() {
+	const [moviesList, setMoviesList] = useState([]);
 	return (
 		<BrowserRouter>
 			<GlobalStyle />
@@ -15,9 +17,12 @@ export default function App() {
 			</MainHeader>
 
 			<Routes>
-				<Route path="/" element={<SelectMoviePage />} />
-				<Route path="/select_time" element={<SelectTimePage />} />
-				<Route path="/select_seat" element={<SelectSeatPage />} />
+				<Route
+					path="/"
+					element={<SelectMoviePage moviesList={moviesList} setMoviesList={setMoviesList} />}
+				/>
+				<Route path="/select_time" element={<SelectTimePage moviesList={moviesList} />} />
+				<Route path="/select_seat" element={<SelectSeatPage moviesList={moviesList} />} />
 				<Route path="/finish_order" element={<FinishOrderPage />} />
 			</Routes>
 		</BrowserRouter>

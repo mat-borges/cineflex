@@ -1,13 +1,27 @@
+import axios from 'axios';
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { movies } from '../mock.js';
 
-export default function SelectMovie() {
+export default function SelectMovie({ moviesList, setMoviesList }) {
+	useEffect(() => {
+		const request = axios.get('https://mock-api.driven.com.br/api/v5/cineflex/movies');
+
+		request.then((promise) => {
+			setMoviesList(promise.data);
+		});
+
+		request.catch((erro) => {
+			console.log(erro.response.data);
+		});
+	}, []);
+
+	console.log(moviesList);
 	return (
 		<SelectMovieBox>
 			<h1>Selecione o filme</h1>
 			<MoviesList>
-				{movies.map((e) => (
+				{moviesList.map((e) => (
 					<li key={e.id}>
 						<Link to="/select_time">
 							<img src={e.posterURL} alt={e.title} title={e.title} />

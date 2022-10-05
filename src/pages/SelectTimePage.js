@@ -1,22 +1,38 @@
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { times } from '../mock';
+import PageFooter from '../components/PageFooter';
 
-export default function SelectTime() {
-	const days = times.days;
+export default function SelectTime({ moviesList }) {
+	const [timesList, setTimesList] = useState([]);
+
+	useEffect(() => {
+		const request = axios.get('https://mock-api.driven.com.br/api/v5/cineflex/movies/1/showtimes');
+
+		request.then((promise) => {
+			setTimesList(promise.data.days);
+		});
+
+		request.catch((erro) => {
+			console.log(erro.response.data);
+		});
+	}, []);
+
+	console.log(timesList);
 	return (
 		<SelectTimeBox>
 			<h1>Selecione o horário</h1>
 			<DatesList>
-				{days.map((e) => (
-					<li key={e.id}>
+				{timesList.map((day, i) => (
+					<li key={day.id}>
 						<h2>
-							{e.weekday} - {e.date}
+							{day.weekday} - {day.date}
 						</h2>
 						<TimesList>
-							{e.showtimes.map((e) => (
-								<Link to="/select_seat" key={e.id}>
-									<li>{e.name}</li>
+							{timesList[i].showtimes.map((time) => (
+								<Link to="/select_seat" key={time.id}>
+									<li>{time.name}</li>
 								</Link>
 							))}
 						</TimesList>
@@ -24,14 +40,8 @@ export default function SelectTime() {
 				))}
 			</DatesList>
 
-			<PageFooter>
-				<img
-					src="https://mundoconectado.com.br/uploads/2022/10/03/28762/fejztbixoamd00qjfif.jpg"
-					alt="movie"
-				/>
-				<div>
-					<p>Wakanda Forever</p>
-				</div>
+			<PageFooter src={moviesList[0].posterURL} alt={moviesList[0].title}>
+				<p>Wakanda Forever</p>
 			</PageFooter>
 		</SelectTimeBox>
 	);
@@ -71,36 +81,6 @@ const TimesList = styled.ul`
 		justify-content: center;
 		border-radius: 5px;
 		margin: 0 10px 10px 0;
-	}
-`;
-
-const PageFooter = styled.div`
-	position: fixed;
-	bottom: 0;
-	left: 0;
-	display: flex;
-	align-items: center;
-	background-color: #dfe6ed;
-	height: 115px;
-	width: 100%;
-	border: 1px solid #9eadba;
-	img {
-		background-color: #ffffff;
-		padding: 8px;
-		height: 90px;
-		margin: 0 10px;
-	}
-	div {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: flex-start;
-		p {
-			font-size: 26px;
-			line-height: 30px;
-			font-weight: 400;
-			word-break: break-all;
-			hyphens: auto;
-		}
+		color: #ffffff;
 	}
 `;
