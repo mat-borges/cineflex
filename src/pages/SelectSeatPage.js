@@ -4,12 +4,13 @@ import { Link, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import PageFooter from '../components/PageFooter';
 
-export default function SelectSeat(props) {
-	const { selectedMovie, setSelectedMovie } = props;
+export default function SelectSeat({ selectedMovie, setSelectedMovie }) {
 	const { timeID } = useParams();
 	const [seatsList, setSeatsList] = useState([]);
-	const [buyer, setBuyer] = useState('');
-	const [cpf, setCPF] = useState('');
+	const [selectedSeats, setSelectedSeats] = useState({ seats: [], ids: [] });
+	const [buyers, setBuyers] = useState([]);
+	const [cpfs, setCPFs] = useState([]);
+	const [movie, setMovie] = useState({ movie: {}, day: {}, name: '' });
 
 	useEffect(() => {
 		const request = axios.get(
@@ -17,7 +18,15 @@ export default function SelectSeat(props) {
 		);
 
 		request.then((promise) => {
+			const newSelectedMovie = { ...selectedMovie };
+			newSelectedMovie.movie.title = promise.data.movie.title;
+			newSelectedMovie.movie.posterURL = promise.data.movie.posterURL;
+			newSelectedMovie.day.weekday = promise.data.day.weekday;
+			newSelectedMovie.day.date = promise.data.day.date;
+			newSelectedMovie.day.time = promise.data.name;
+			setSelectedMovie(newSelectedMovie);
 			setSeatsList(promise.data.seats);
+			setMovie(promise.data);
 		});
 
 		request.catch((erro) => {
@@ -27,35 +36,50 @@ export default function SelectSeat(props) {
 
 	function chooseSeats() {
 		let newSelectedMovie = { ...selectedMovie };
-
-		if (newSelectedMovie.seats.ids.length !== 0 && buyer !== '' && cpf !== '') {
-			newSelectedMovie.seats.name = buyer;
-			newSelectedMovie.seats.cpf = cpf;
+		if (selectedSeats.seats.length !== 0 && buyers.length !== 0 && cpfs.length !== 0) {
+			selectedSeats.seats.forEach((e, i) => {
+				newSelectedMovie.seats[i] = {
+					seat: selectedSeats.seats[i],
+					id: selectedSeats.ids[i],
+					name: buyers[i],
+					cpf: cpfs[i],
+				};
+			});
+			console.log(newSelectedMovie);
 			setSelectedMovie(newSelectedMovie);
 		} else {
 			if (newSelectedMovie.seats.ids.length === 0) {
 				alert('Você precisa selecionar pelo menos 1 assento');
 			}
-			if (buyer === '') {
+			if (buyers === '') {
 				alert('Você precisa inserir um nome válido');
 			}
-			if (cpf === '') {
+			if (cpfs === '') {
 				alert('Você precisa inserir um CPF válido');
 			}
 		}
 	}
 
-	function changeSeats(number, id) {
-		let newSelectedMovie = { ...selectedMovie };
+	function changeSeats(seat) {
+		const newSelectedSeats = { ...selectedSeats };
 
-		if (!newSelectedMovie.seats.seats.includes(number)) {
-			newSelectedMovie.seats.seats.push(number);
-			newSelectedMovie.seats.ids.push(id);
-			setSelectedMovie(newSelectedMovie);
+		if (!seat.isAvailable) {
+			alert('Esse assento não está disponível');
+		}
+		if (!selectedSeats.seats.includes(seat.name)) {
+			newSelectedSeats.seats.push(seat.name);
+			newSelectedSeats.ids.push(seat.id);
+			setSelectedSeats(newSelectedSeats);
+			// } else if (buyers.length !== 0 && cpfs.length !== 0) {
+			// 	if (window.confirm('Você tem certeza que deseja remover esse assento?')) {
+			// 		newSelectedSeats.ids = newSelectedSeats.ids.filter((e) => e !== seat.id);
+			// 		newSelectedSeats.seats = newSelectedSeats.seats.filter((e) => e !== seat.name);
+			// 		setSelectedSeats(newSelectedSeats);
+			// 	}
 		} else {
-			newSelectedMovie.seats.ids = newSelectedMovie.seats.ids.filter((e) => e !== id);
-			newSelectedMovie.seats.seats = newSelectedMovie.seats.seats.filter((e) => e !== number);
-			setSelectedMovie(newSelectedMovie);
+			newSelectedSeats.ids = newSelectedSeats.ids.filter((e) => e !== seat.id);
+			newSelectedSeats.seats = newSelectedSeats.seats.filter((e) => e !== seat.name);
+			setSelectedSeats(newSelectedSeats);
 		}
 	}
 
@@ -66,7 +90,7 @@ export default function SelectSeat(props) {
 		} else {
 			color = '#FBE192';
 		}
-		if (seat.isAvailable && selectedMovie.seats.seats.includes(seat.name)) {
+		if (seat.isAvailable && selectedSeats.seats.includes(seat.name)) {
 			color = '#1AAE9E';
 		}
 		return color;
@@ -79,10 +103,22 @@ export default function SelectSeat(props) {
 		} else {
 			color = '#F7C52B';
 		}
-		if (seat.isAvailable && selectedMovie.seats.seats.includes(seat.name)) {
+		if (seat.isAvailable && selectedSeats.seats.includes(seat.name)) {
 			color = '#0E7D71';
 		}
 		return color;
+	}
+
+	function addBuyer(name, index) {
+		const newBuyers = [...buyers];
+		newBuyers[index] = name;
+		setBuyers(newBuyers);
+	}
+
+	function addCPF(name, index) {
+		const newCPFs = [...cpfs];
+		newCPFs[index] = name;
+		setCPFs(newCPFs);
 	}
 
 	return (
@@ -97,51 +133,62 @@ export default function SelectSeat(props) {
 						key={seat.id}
 						backColor={checkBackColor(seat)}
 						borderColor={checkBorderColor(seat)}
-						onClick={() => changeSeats(seat.name, seat.id)}
+						onClick={() => changeSeats(seat)}
+						data-identifier="seat"
 					/>
 				))}
 			</SeatList>
 
 			<StatusLabels>
-				<span>
+				<span data-identifier="seat-selected-subtitle">
 					<SeatStatus backColor={'#1AAE9E'} borderColor={'#0E7D71'}></SeatStatus>
 					<p>Selecionado</p>
 				</span>
-				<span>
+				<span data-identifier="seat-available-subtitle">
 					<SeatStatus backColor={'#c3cfd9'} borderColor={'#808f9d'}></SeatStatus>
 					<p>Disponível</p>
 				</span>
-				<span>
+				<span data-identifier="seat-unavailable-subtitle">
 					<SeatStatus backColor={'#FBE192'} borderColor={'#F7C52B'}></SeatStatus>
 					<p>Indisponível</p>
 				</span>
 			</StatusLabels>
 
 			<Inputs>
-				<h2>Nome do comprador</h2>
-				<input
-					type="text"
-					placeholder="Digite seu nome..."
-					onChange={(e) => setBuyer(e.target.value)}
-				/>
-				<h2>CPF</h2>
-				<input
-					type="text"
-					placeholder="Digite seu CPF..."
-					pattern="(\d{3}\.?\d{3}\.?\d{3}-?\d{2})|(\d{2}\.?\d{3}\.?\d{3}/?\d{4}-?\d{2})"
-					onChange={(e) => setCPF(e.target.value)}
-				/>
+				{selectedSeats.seats.map((seat, index) => (
+					<div key={index}>
+						<h2>Nome do comprador ({seat})</h2>
+						<input
+							type="text"
+							placeholder="Digite seu nome..."
+							onChange={(e) => addBuyer(e.target.value, index)}
+							data-identifier="buyer-name-input"
+						/>
+						<h2>CPF ({seat})</h2>
+						<input
+							type="text"
+							placeholder="Digite seu CPF..."
+							pattern="(\d{3}\.?\d{3}\.?\d{3}-?\d{2})|(\d{2}\.?\d{3}\.?\d{3}/?\d{4}-?\d{2})"
+							onChange={(e) => addCPF(e.target.value, index)}
+							data-identifier="buyer-cpf-input"
+						/>
+					</div>
+				))}
 			</Inputs>
 
 			<Link to="/finish_order">
-				<input type="submit" value="Reservar assento(s)" onClick={() => chooseSeats()} />
+				<input
+					type="submit"
+					value="Reservar assento(s)"
+					onClick={() => chooseSeats()}
+					data-identifier="reservation-btn"
+				/>
 			</Link>
 
-			<PageFooter src={selectedMovie.movie.posterURL} alt={selectedMovie.movie.title}>
-				<p>{selectedMovie.movie.title}</p>
-				<p>{selectedMovie.day.date}</p>
+			<PageFooter url={movie.movie.posterURL} title={movie.movie.title}>
+				<p>{movie.day.date}</p>
 				<p>
-					{selectedMovie.day.weekday} - {selectedMovie.day.time}
+					{movie.day.weekday} - {movie.name}
 				</p>
 			</PageFooter>
 		</SelectSeatBox>
@@ -152,7 +199,7 @@ const SelectSeatBox = styled.div`
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	margin-bottom: 115px;
+	margin-bottom: 125px;
 	h1 {
 		margin: 40px 0 25px 0;
 		display: flex;

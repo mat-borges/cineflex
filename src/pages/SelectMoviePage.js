@@ -19,8 +19,9 @@ export default function SelectMovie({ selectedMovie, setSelectedMovie }) {
 	}, []);
 
 	function chooseMovie(movie) {
-		let newSelectedMovie = { ...selectedMovie };
-		newSelectedMovie.movie = movie;
+		const newSelectedMovie = { ...selectedMovie };
+		newSelectedMovie.movie.title = movie.title;
+		newSelectedMovie.movie.posterURL = movie.posterURL;
 		setSelectedMovie(newSelectedMovie);
 	}
 
@@ -30,8 +31,8 @@ export default function SelectMovie({ selectedMovie, setSelectedMovie }) {
 
 			<MoviesList>
 				{moviesList.map((e) => (
-					<li key={e.id} onClick={() => chooseMovie(e)}>
-						<Link to={`/${e.id}/select_time`}>
+					<li key={e.id} onClick={() => chooseMovie(e)} data-identifier="movie-outdoor">
+						<Link to={`/sessoes/${e.id}`}>
 							<img src={e.posterURL} alt={e.title} title={e.title} />
 						</Link>
 					</li>
@@ -75,6 +76,10 @@ const MoviesList = styled.ul`
 		img {
 			width: 130px;
 			height: 195px;
+		}
+		:hover,
+		:active {
+			outline: 2px solid #e8833a;
 		}
 	}
 `;

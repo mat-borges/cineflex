@@ -10,10 +10,12 @@ import { useState } from 'react';
 
 export default function App() {
 	const [selectedMovie, setSelectedMovie] = useState({
-		movie: {},
+		movie: { title: '', posterURL: '' },
 		day: { weekday: '', date: '', time: '' },
-		seats: { seats: [], ids: [], name: '', cpf: '' },
+		seats: { ids: [], compradores: { idAssento: '', nome: '', cpf: '' } },
 	});
+	console.log(selectedMovie.seats);
+	console.log(selectedMovie.seats.seat);
 
 	return (
 		<BrowserRouter>
@@ -33,13 +35,13 @@ export default function App() {
 					}
 				/>
 				<Route
-					path="/:movieID/select_time"
+					path="/sessoes/:movieID"
 					element={
 						<SelectTimePage selectedMovie={selectedMovie} setSelectedMovie={setSelectedMovie} />
 					}
 				/>
 				<Route
-					path="/:timeID/select_seat"
+					path="/assentos/:timeID"
 					element={
 						<SelectSeatPage selectedMovie={selectedMovie} setSelectedMovie={setSelectedMovie} />
 					}

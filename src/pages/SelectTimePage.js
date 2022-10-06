@@ -4,10 +4,10 @@ import { Link, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import PageFooter from '../components/PageFooter';
 
-export default function SelectTime(props) {
-	const [timesList, setTimesList] = useState([]);
-	const { selectedMovie, setSelectedMovie } = props;
+export default function SelectTime({ selectedMovie, setSelectedMovie }) {
 	const { movieID } = useParams();
+	const [timesList, setTimesList] = useState([]);
+	const [movie, setMovie] = useState({});
 
 	useEffect(() => {
 		const request = axios.get(
@@ -15,7 +15,12 @@ export default function SelectTime(props) {
 		);
 
 		request.then((promise) => {
+			const newSelectedMovie = { ...selectedMovie };
+			newSelectedMovie.movie.title = promise.data.title;
+			newSelectedMovie.movie.posterURL = promise.data.posterURL;
+			setSelectedMovie(newSelectedMovie);
 			setTimesList(promise.data.days);
+			setMovie(promise.data);
 		});
 
 		request.catch((erro) => {
@@ -24,7 +29,7 @@ export default function SelectTime(props) {
 	}, [movieID]);
 
 	function chooseTime(day, time) {
-		let newSelectedMovie = { ...selectedMovie };
+		const newSelectedMovie = { ...selectedMovie };
 		newSelectedMovie.day.weekday = day.weekday;
 		newSelectedMovie.day.date = day.date;
 		newSelectedMovie.day.time = time.name;
@@ -37,14 +42,16 @@ export default function SelectTime(props) {
 
 			<DatesList>
 				{timesList.map((day, i) => (
-					<li key={day.id}>
+					<li key={day.id} data-identifier="session-date">
 						<h2>
 							{day.weekday} - {day.date}
 						</h2>
 						<TimesList>
 							{timesList[i].showtimes.map((time) => (
-								<Link to={`/${time.id}/select_seat`} key={time.id}>
-									<li onClick={() => chooseTime(day, time)}>{time.name}</li>
+								<Link to={`/assentos/${time.id}`} key={time.id}>
+									<li onClick={() => chooseTime(day, time)} data-identifier="hour-minute-btn">
+										{time.name}
+									</li>
 								</Link>
 							))}
 						</TimesList>
@@ -52,9 +59,7 @@ export default function SelectTime(props) {
 				))}
 			</DatesList>
 
-			<PageFooter src={selectedMovie.movie.posterURL} alt={selectedMovie.movie.title}>
-				<p>{selectedMovie.movie.title}</p>
-			</PageFooter>
+			<PageFooter url={movie.posterURL} title={movie.title} />
 		</SelectTimeBox>
 	);
 }
@@ -94,5 +99,9 @@ const TimesList = styled.ul`
 		border-radius: 5px;
 		margin: 0 10px 10px 0;
 		color: #ffffff;
+		:hover,
+		:active {
+			outline: 2px solid #e8833a;
+		}
 	}
 `;

@@ -15,22 +15,24 @@ export default function FinishOrder({ selectedMovie, setSelectedMovie }) {
 			<h1>Pedido feito com sucesso!</h1>
 			<TicketsSummary>
 				<h2>Filmes e sessões</h2>
-				<p>{selectedMovie.movie.title}</p>
-				<p>
+				<p data-identifier="movie-session-infos-reserve-finished">{selectedMovie.movie.title}</p>
+				<p data-identifier="movie-session-infos-reserve-finished">
 					{selectedMovie.day.date} {selectedMovie.day.time}
 				</p>
 				<h2>Ingressos</h2>
 				{selectedMovie.seats.seats.map((e, i) => (
-					<p key={i}>Assento {e}</p>
+					<p key={i} data-identifier="seat-infos-reserve-finished">
+						Assento {e}
+					</p>
 				))}
 
 				<h2>Comprador</h2>
-				<p>{selectedMovie.seats.name}</p>
-				<p>{selectedMovie.seats.cpf}</p>
+				<p data-identifier="buyer-infos-reserve-finished">{selectedMovie.seats.name}</p>
+				<p data-identifier="buyer-infos-reserve-finished">{selectedMovie.seats.cpf}</p>
 			</TicketsSummary>
 
 			<Link to="/" onClick={resetSelectedMovie}>
-				<button>Voltar para home</button>
+				<button data-identifier="back-to-home-btn">Voltar para home</button>
 			</Link>
 		</FinishOrderBox>
 	);
