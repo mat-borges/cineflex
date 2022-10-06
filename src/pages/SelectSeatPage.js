@@ -3,14 +3,11 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import PageFooter from '../components/PageFooter';
-import backIcon from '../assets/arrow-back-outline.png';
 
 export default function SelectSeat(props) {
 	const { selectedMovie, setSelectedMovie } = props;
 	const { timeID } = useParams();
 	const [seatsList, setSeatsList] = useState([]);
-	const [seats, setSeats] = useState([]);
-	const [seatID, setSeatID] = useState([]);
 	const [buyer, setBuyer] = useState('');
 	const [cpf, setCPF] = useState('');
 
@@ -31,14 +28,12 @@ export default function SelectSeat(props) {
 	function chooseSeats() {
 		let newSelectedMovie = { ...selectedMovie };
 
-		if (seats.length !== 0 && buyer !== '' && cpf !== '') {
-			newSelectedMovie.seats.seats = [...seats];
-			newSelectedMovie.seats.ids = [...seatID];
+		if (newSelectedMovie.seats.ids.length !== 0 && buyer !== '' && cpf !== '') {
 			newSelectedMovie.seats.name = buyer;
 			newSelectedMovie.seats.cpf = cpf;
 			setSelectedMovie(newSelectedMovie);
 		} else {
-			if (seats.length === 0) {
+			if (newSelectedMovie.seats.ids.length === 0) {
 				alert('Você precisa selecionar pelo menos 1 assento');
 			}
 			if (buyer === '') {
@@ -51,19 +46,16 @@ export default function SelectSeat(props) {
 	}
 
 	function changeSeats(number, id) {
-		let newSeats = [...seats];
-		let newSeatsID = [...seatID];
+		let newSelectedMovie = { ...selectedMovie };
 
-		if (!seats.includes(number)) {
-			newSeats.push(number);
-			newSeatsID.push(id);
-			setSeats(newSeats);
-			setSeatID(newSeatsID);
+		if (!newSelectedMovie.seats.seats.includes(number)) {
+			newSelectedMovie.seats.seats.push(number);
+			newSelectedMovie.seats.ids.push(id);
+			setSelectedMovie(newSelectedMovie);
 		} else {
-			newSeatsID = newSeatsID.filter((e) => e !== id);
-			newSeats = newSeats.filter((e) => e !== number);
-			setSeats(newSeats);
-			setSeatID(newSeatsID);
+			newSelectedMovie.seats.ids = newSelectedMovie.seats.ids.filter((e) => e !== id);
+			newSelectedMovie.seats.seats = newSelectedMovie.seats.seats.filter((e) => e !== number);
+			setSelectedMovie(newSelectedMovie);
 		}
 	}
 
@@ -74,7 +66,7 @@ export default function SelectSeat(props) {
 		} else {
 			color = '#FBE192';
 		}
-		if (seat.isAvailable && seats.includes(seat.name)) {
+		if (seat.isAvailable && selectedMovie.seats.seats.includes(seat.name)) {
 			color = '#1AAE9E';
 		}
 		return color;
@@ -87,7 +79,7 @@ export default function SelectSeat(props) {
 		} else {
 			color = '#F7C52B';
 		}
-		if (seat.isAvailable && seats.includes(seat.name)) {
+		if (seat.isAvailable && selectedMovie.seats.seats.includes(seat.name)) {
 			color = '#0E7D71';
 		}
 		return color;
@@ -95,10 +87,7 @@ export default function SelectSeat(props) {
 
 	return (
 		<SelectSeatBox>
-			<h1>
-				<Icon src={backIcon} alt="backIcon" />
-				Selecione o(s) assento(s)
-			</h1>
+			<h1>Selecione o(s) assento(s)</h1>
 
 			<SeatList>
 				{seatsList.map((seat) => (
@@ -262,10 +251,4 @@ const Inputs = styled.div`
 			font-style: italic;
 		}
 	}
-`;
-
-const Icon = styled.img`
-	width: 25px;
-	height: 25px;
-	margin-right: 20px;
 `;

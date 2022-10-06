@@ -1,8 +1,15 @@
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
-export default function FinishOrder({ selectedMovie }) {
-	console.log(selectedMovie);
+export default function FinishOrder({ selectedMovie, setSelectedMovie }) {
+	function resetSelectedMovie() {
+		setSelectedMovie({
+			movie: {},
+			day: { weekday: '', date: '', time: '' },
+			seats: { seats: [], ids: [], name: '', cpf: '' },
+		});
+	}
+
 	return (
 		<FinishOrderBox>
 			<h1>Pedido feito com sucesso!</h1>
@@ -13,8 +20,8 @@ export default function FinishOrder({ selectedMovie }) {
 					{selectedMovie.day.date} {selectedMovie.day.time}
 				</p>
 				<h2>Ingressos</h2>
-				{selectedMovie.seats.seats.map((e) => (
-					<p>Assento {e}</p>
+				{selectedMovie.seats.seats.map((e, i) => (
+					<p key={i}>Assento {e}</p>
 				))}
 
 				<h2>Comprador</h2>
@@ -22,7 +29,7 @@ export default function FinishOrder({ selectedMovie }) {
 				<p>{selectedMovie.seats.cpf}</p>
 			</TicketsSummary>
 
-			<Link to="/">
+			<Link to="/" onClick={resetSelectedMovie}>
 				<button>Voltar para home</button>
 			</Link>
 		</FinishOrderBox>

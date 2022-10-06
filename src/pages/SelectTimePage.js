@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import PageFooter from '../components/PageFooter';
-import backIcon from '../assets/arrow-back-outline.png';
 
 export default function SelectTime(props) {
 	const [timesList, setTimesList] = useState([]);
@@ -34,10 +33,7 @@ export default function SelectTime(props) {
 
 	return (
 		<SelectTimeBox>
-			<h1>
-				<Icon src={backIcon} alt="backIcon" />
-				Selecione o horário
-			</h1>
+			<h1>Selecione o horário</h1>
 
 			<DatesList>
 				{timesList.map((day, i) => (
@@ -99,10 +95,4 @@ const TimesList = styled.ul`
 		margin: 0 10px 10px 0;
 		color: #ffffff;
 	}
-`;
-
-const Icon = styled.img`
-	width: 25px;
-	height: 25px;
-	margin-right: 20px;
 `;
