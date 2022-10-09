@@ -1,16 +1,18 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
+import Loading from '../components/Loading';
 import PageFooter from '../components/PageFooter';
 
 export default function SelectSeat({ selectedMovie, setSelectedMovie }) {
 	const { timeID } = useParams();
 	const [seatsList, setSeatsList] = useState([]);
-	const [selectedSeats, setSelectedSeats] = useState({ seats: [], ids: [] });
+	const [ids, setIds] = useState([]);
+	const [seats, setSeats] = useState([]);
 	const [buyers, setBuyers] = useState([]);
-	const [cpfs, setCPFs] = useState([]);
 	const [movie, setMovie] = useState({ movie: {}, day: {}, name: '' });
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		const request = axios.get(
@@ -34,52 +36,73 @@ export default function SelectSeat({ selectedMovie, setSelectedMovie }) {
 		});
 	}, [timeID]);
 
-	function chooseSeats() {
+	if (seatsList.length === 0) {
+		return <Loading />;
+	}
+
+	function chooseSeats(e) {
 		let newSelectedMovie = { ...selectedMovie };
-		if (selectedSeats.seats.length !== 0 && buyers.length !== 0 && cpfs.length !== 0) {
-			selectedSeats.seats.forEach((e, i) => {
-				newSelectedMovie.seats[i] = {
-					seat: selectedSeats.seats[i],
-					id: selectedSeats.ids[i],
-					name: buyers[i],
-					cpf: cpfs[i],
-				};
-			});
-			console.log(newSelectedMovie);
+		e.preventDefault();
+
+		if (ids.length !== 0) {
+			newSelectedMovie.seats.ids = ids;
+			newSelectedMovie.seats.compradores = buyers;
+			newSelectedMovie.seatsName = seats;
 			setSelectedMovie(newSelectedMovie);
+			const finish = axios.post(
+				'https://mock-api.driven.com.br/api/v5/cineflex/seats/book-many',
+				newSelectedMovie.seats
+			);
+
+			finish.then(navigate('/finish_order'));
+
+			finish.catch((err) => console.log(err.response.data));
 		} else {
-			if (newSelectedMovie.seats.ids.length === 0) {
+			if (ids.length === 0) {
 				alert('Você precisa selecionar pelo menos 1 assento');
 			}
-			if (buyers === '') {
+			if (buyers.find((e) => e.nome === '') !== undefined) {
 				alert('Você precisa inserir um nome válido');
 			}
-			if (cpfs === '') {
+			if (buyers.find((e) => e.cpf === '') !== undefined) {
 				alert('Você precisa inserir um CPF válido');
 			}
 		}
 	}
 
 	function changeSeats(seat) {
-		const newSelectedSeats = { ...selectedSeats };
+		let newIds = [...ids];
+		let newBuyers = [...buyers];
+		let newSeats = [...seats];
+		const i = buyers.findIndex((e) => e.idAssento === seat.id);
 
 		if (!seat.isAvailable) {
-			alert('Esse assento não está disponível');
+			return alert('Esse assento não está disponível');
 		}
-		if (!selectedSeats.seats.includes(seat.name)) {
-			newSelectedSeats.seats.push(seat.name);
-			newSelectedSeats.ids.push(seat.id);
-			setSelectedSeats(newSelectedSeats);
-			// } else if (buyers.length !== 0 && cpfs.length !== 0) {
-			// 	if (window.confirm('Você tem certeza que deseja remover esse assento?')) {
-			// 		newSelectedSeats.ids = newSelectedSeats.ids.filter((e) => e !== seat.id);
-			// 		newSelectedSeats.seats = newSelectedSeats.seats.filter((e) => e !== seat.name);
-			// 		setSelectedSeats(newSelectedSeats);
-			// 	}
+
+		if (!ids.includes(seat.id)) {
+			newIds.push(seat.id);
+			newSeats.push(seat.name);
+			newBuyers.push({ idAssento: seat.id, nome: '', cpf: '' });
+			setIds(newIds);
+			setSeats(newSeats);
+			setBuyers(newBuyers);
+		} else if (newBuyers[i].nome !== '' || newBuyers[i].cpf !== '') {
+			if (window.confirm('Você tem certeza que deseja remover esse assento?')) {
+				newIds = newIds.filter((e) => e !== seat.id);
+				newBuyers = newBuyers.filter((e) => e.idAssento !== seat.id);
+				newSeats = newSeats.filter((e) => e !== seat.name);
+				setIds(newIds);
+				setBuyers(newBuyers);
+				setSeats(newSeats);
+			}
 		} else {
-			newSelectedSeats.ids = newSelectedSeats.ids.filter((e) => e !== seat.id);
-			newSelectedSeats.seats = newSelectedSeats.seats.filter((e) => e !== seat.name);
-			setSelectedSeats(newSelectedSeats);
+			newIds = newIds.filter((e) => e !== seat.id);
+			newBuyers = newBuyers.filter((e) => e.idAssento !== seat.id);
+			newSeats = newSeats.filter((e) => e !== seat.name);
+			setIds(newIds);
+			setBuyers(newBuyers);
+			setSeats(newSeats);
 		}
 	}
 
@@ -90,7 +113,7 @@ export default function SelectSeat({ selectedMovie, setSelectedMovie }) {
 		} else {
 			color = '#FBE192';
 		}
-		if (seat.isAvailable && selectedSeats.seats.includes(seat.name)) {
+		if (seat.isAvailable && ids.includes(seat.id)) {
 			color = '#1AAE9E';
 		}
 		return color;
@@ -103,22 +126,38 @@ export default function SelectSeat({ selectedMovie, setSelectedMovie }) {
 		} else {
 			color = '#F7C52B';
 		}
-		if (seat.isAvailable && selectedSeats.seats.includes(seat.name)) {
+		if (seat.isAvailable && ids.includes(seat.id)) {
 			color = '#0E7D71';
 		}
 		return color;
 	}
 
-	function addBuyer(name, index) {
-		const newBuyers = [...buyers];
-		newBuyers[index] = name;
+	function addBuyer(value, id) {
+		let newBuyers = [...buyers];
+
+		newBuyers.forEach((e) => {
+			if (e.idAssento === id) {
+				e.nome = value;
+			}
+		});
 		setBuyers(newBuyers);
 	}
 
-	function addCPF(name, index) {
-		const newCPFs = [...cpfs];
-		newCPFs[index] = name;
-		setCPFs(newCPFs);
+	function addCPF(value, id) {
+		let newBuyers = [...buyers];
+
+		newBuyers.forEach((e) => {
+			if (e.idAssento === id) {
+				e.cpf = value
+					.replace(/\D/g, '') // substitui qualquer caracter que nao seja numero por nada
+					.replace(/(\d{3})(\d)/, '$1.$2') // captura 2 grupos de numero o primeiro de 3 e o segundo de 1, apos capturar o primeiro grupo ele adiciona um ponto antes do segundo grupo de numero
+					.replace(/(\d{3})(\d)/, '$1.$2')
+					.replace(/(\d{3})(\d{1,2})/, '$1-$2')
+					.replace(/(-\d{2})\d+?$/, '$1');
+			}
+		});
+
+		setBuyers(newBuyers);
 	}
 
 	return (
@@ -154,36 +193,35 @@ export default function SelectSeat({ selectedMovie, setSelectedMovie }) {
 				</span>
 			</StatusLabels>
 
-			<Inputs>
-				{selectedSeats.seats.map((seat, index) => (
+			<Inputs onSubmit={chooseSeats}>
+				{ids.map((id, index) => (
 					<div key={index}>
-						<h2>Nome do comprador ({seat})</h2>
+						<label htmlFor={`buyer${index}`}>Nome do comprador ({seats[index]})</label>
 						<input
+							id={`buyer${index}`}
 							type="text"
 							placeholder="Digite seu nome..."
-							onChange={(e) => addBuyer(e.target.value, index)}
+							value={buyers[index].nome}
+							onChange={(e) => addBuyer(e.target.value, id)}
+							required
 							data-identifier="buyer-name-input"
 						/>
-						<h2>CPF ({seat})</h2>
+						<label htmlFor={`cpf${index}`}>CPF ({seats[index]})</label>
 						<input
+							id={`cpf${index}`}
 							type="text"
 							placeholder="Digite seu CPF..."
 							pattern="(\d{3}\.?\d{3}\.?\d{3}-?\d{2})|(\d{2}\.?\d{3}\.?\d{3}/?\d{4}-?\d{2})"
-							onChange={(e) => addCPF(e.target.value, index)}
+							value={buyers[index].cpf}
+							onChange={(e) => addCPF(e.target.value, id)}
+							required
 							data-identifier="buyer-cpf-input"
 						/>
 					</div>
 				))}
-			</Inputs>
 
-			<Link to="/finish_order">
-				<input
-					type="submit"
-					value="Reservar assento(s)"
-					onClick={() => chooseSeats()}
-					data-identifier="reservation-btn"
-				/>
-			</Link>
+				<input type="submit" value="Reservar assento(s)" data-identifier="reservation-btn" />
+			</Inputs>
 
 			<PageFooter url={movie.movie.posterURL} title={movie.movie.title}>
 				<p>{movie.day.date}</p>
@@ -209,18 +247,6 @@ const SelectSeatBox = styled.div`
 		font-size: 24px;
 		font-weight: 400;
 		letter-spacing: 2px;
-	}
-	input[type='submit'] {
-		width: 225px;
-		height: 42px;
-		background-color: #e8833a;
-		border-radius: 5px;
-		border: none;
-		margin-top: 30px;
-		font-size: 18px;
-		color: #ffffff;
-		text-align: center;
-		cursor: pointer;
 	}
 `;
 
@@ -281,21 +307,35 @@ const SeatStatus = styled(Seat)`
 	}
 `;
 
-const Inputs = styled.div`
+const Inputs = styled.form`
 	width: 100%;
-	margin-top: 20px;
-	h2 {
-		margin-left: 24px;
+	padding: 20px 24px 0 24px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	label {
 		font-size: 18px;
 		line-height: 21px;
 	}
 	input[type='text'] {
-		width: 90%;
+		width: 100%;
 		height: 51px;
 		padding-left: 15px;
-		margin: 3px auto 7px 24px;
+		margin: 3px 0 7px 0;
 		::placeholder {
 			font-style: italic;
 		}
+	}
+	input[type='submit'] {
+		width: 225px;
+		height: 42px;
+		background-color: #e8833a;
+		border-radius: 5px;
+		border: none;
+		margin-top: 30px;
+		font-size: 18px;
+		color: #ffffff;
+		text-align: center;
+		cursor: pointer;
 	}
 `;

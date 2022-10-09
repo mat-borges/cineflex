@@ -2,6 +2,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import styled from 'styled-components';
+import Loading from '../components/Loading';
 import PageFooter from '../components/PageFooter';
 
 export default function SelectTime({ selectedMovie, setSelectedMovie }) {
@@ -27,6 +28,10 @@ export default function SelectTime({ selectedMovie, setSelectedMovie }) {
 			console.log(erro.response.data);
 		});
 	}, [movieID]);
+
+	if (timesList.length === 0) {
+		return <Loading />;
+	}
 
 	function chooseTime(day, time) {
 		const newSelectedMovie = { ...selectedMovie };

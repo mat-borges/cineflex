@@ -5,55 +5,56 @@ import SelectSeatPage from '../pages/SelectSeatPage.js';
 import SelectTimePage from '../pages/SelectTimePage.js';
 import GlobalStyle from '../style/GlobalStyle.js';
 import backIcon from '../assets/arrow-back-outline.png';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
 import { useState } from 'react';
 
 export default function App() {
 	const [selectedMovie, setSelectedMovie] = useState({
 		movie: { title: '', posterURL: '' },
 		day: { weekday: '', date: '', time: '' },
-		seats: { ids: [], compradores: { idAssento: '', nome: '', cpf: '' } },
+		seats: { ids: [], compradores: [{ idAssento: '', nome: '', cpf: '' }] },
+		seatsName: [],
 	});
-	console.log(selectedMovie.seats);
-	console.log(selectedMovie.seats.seat);
 
 	return (
-		<BrowserRouter>
-			<GlobalStyle />
+		<>
 			<MainHeader>
 				<div>
-					{selectedMovie.movie.id === undefined ? '' : <Icon src={backIcon} alt="backIcon" />}
+					{selectedMovie.movie.title === '' ? '' : <Icon src={backIcon} alt="backIcon" />}
 					CINEFLIX
 				</div>
 			</MainHeader>
+			<BrowserRouter>
+				<GlobalStyle />
 
-			<Routes>
-				<Route
-					path="/"
-					element={
-						<SelectMoviePage selectedMovie={selectedMovie} setSelectedMovie={setSelectedMovie} />
-					}
-				/>
-				<Route
-					path="/sessoes/:movieID"
-					element={
-						<SelectTimePage selectedMovie={selectedMovie} setSelectedMovie={setSelectedMovie} />
-					}
-				/>
-				<Route
-					path="/assentos/:timeID"
-					element={
-						<SelectSeatPage selectedMovie={selectedMovie} setSelectedMovie={setSelectedMovie} />
-					}
-				/>
-				<Route
-					path="/finish_order"
-					element={
-						<FinishOrderPage selectedMovie={selectedMovie} setSelectedMovie={setSelectedMovie} />
-					}
-				/>
-			</Routes>
-		</BrowserRouter>
+				<Routes>
+					<Route
+						path="/"
+						element={
+							<SelectMoviePage selectedMovie={selectedMovie} setSelectedMovie={setSelectedMovie} />
+						}
+					/>
+					<Route
+						path="/sessoes/:movieID"
+						element={
+							<SelectTimePage selectedMovie={selectedMovie} setSelectedMovie={setSelectedMovie} />
+						}
+					/>
+					<Route
+						path="/assentos/:timeID"
+						element={
+							<SelectSeatPage selectedMovie={selectedMovie} setSelectedMovie={setSelectedMovie} />
+						}
+					/>
+					<Route
+						path="/finish_order"
+						element={
+							<FinishOrderPage selectedMovie={selectedMovie} setSelectedMovie={setSelectedMovie} />
+						}
+					/>
+				</Routes>
+			</BrowserRouter>
+		</>
 	);
 }
 

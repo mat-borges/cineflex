@@ -4,9 +4,10 @@ import styled from 'styled-components';
 export default function FinishOrder({ selectedMovie, setSelectedMovie }) {
 	function resetSelectedMovie() {
 		setSelectedMovie({
-			movie: {},
+			movie: { title: '', posterURL: '' },
 			day: { weekday: '', date: '', time: '' },
-			seats: { seats: [], ids: [], name: '', cpf: '' },
+			seats: { ids: [], compradores: [{ idAssento: '', nome: '', cpf: '' }] },
+			seatsName: [],
 		});
 	}
 
@@ -20,15 +21,15 @@ export default function FinishOrder({ selectedMovie, setSelectedMovie }) {
 					{selectedMovie.day.date} {selectedMovie.day.time}
 				</p>
 				<h2>Ingressos</h2>
-				{selectedMovie.seats.seats.map((e, i) => (
-					<p key={i} data-identifier="seat-infos-reserve-finished">
-						Assento {e}
-					</p>
+				{selectedMovie.seats.compradores.map((e, i) => (
+					<div key={e.idAssento}>
+						<p key={i} data-identifier="seat-infos-reserve-finished">
+							Assento {selectedMovie.seatsName[i]}
+						</p>
+						<p data-identifier="buyer-infos-reserve-finished">Nome: {e.nome}</p>
+						<p data-identifier="buyer-infos-reserve-finished">CPF: {e.cpf}</p>
+					</div>
 				))}
-
-				<h2>Comprador</h2>
-				<p data-identifier="buyer-infos-reserve-finished">{selectedMovie.seats.name}</p>
-				<p data-identifier="buyer-infos-reserve-finished">{selectedMovie.seats.cpf}</p>
 			</TicketsSummary>
 
 			<Link to="/" onClick={resetSelectedMovie}>
