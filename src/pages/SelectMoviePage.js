@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import Loading from '../components/Loading';
 
-export default function SelectMovie({ selectedMovie, setSelectedMovie }) {
+export default function SelectMovie({ selectedMovie, setSelectedMovie, setLink }) {
 	const [moviesList, setMoviesList] = useState([]);
 
 	useEffect(() => {
@@ -12,6 +12,7 @@ export default function SelectMovie({ selectedMovie, setSelectedMovie }) {
 
 		request.then((promise) => {
 			setMoviesList(promise.data);
+			setLink('');
 		});
 
 		request.catch((erro) => {
@@ -28,6 +29,7 @@ export default function SelectMovie({ selectedMovie, setSelectedMovie }) {
 		newSelectedMovie.movie.title = movie.title;
 		newSelectedMovie.movie.posterURL = movie.posterURL;
 		setSelectedMovie(newSelectedMovie);
+		setLink('/');
 	}
 
 	return (

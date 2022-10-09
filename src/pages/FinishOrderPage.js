@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
-export default function FinishOrder({ selectedMovie, setSelectedMovie }) {
+export default function FinishOrder({ selectedMovie, setSelectedMovie, setLink }) {
 	function resetSelectedMovie() {
 		setSelectedMovie({
 			movie: { title: '', posterURL: '' },

@@ -5,8 +5,8 @@ import styled from 'styled-components';
 import Loading from '../components/Loading';
 import PageFooter from '../components/PageFooter';
 
-export default function SelectSeat({ selectedMovie, setSelectedMovie }) {
-	const { timeID } = useParams();
+export default function SelectSeat({ selectedMovie, setSelectedMovie, setLink }) {
+	const { timeID, movieID } = useParams();
 	const [seatsList, setSeatsList] = useState([]);
 	const [ids, setIds] = useState([]);
 	const [seats, setSeats] = useState([]);
@@ -29,6 +29,7 @@ export default function SelectSeat({ selectedMovie, setSelectedMovie }) {
 			setSelectedMovie(newSelectedMovie);
 			setSeatsList(promise.data.seats);
 			setMovie(promise.data);
+			setLink(`/sessoes/${movieID}`);
 		});
 
 		request.catch((erro) => {
@@ -53,8 +54,9 @@ export default function SelectSeat({ selectedMovie, setSelectedMovie }) {
 				'https://mock-api.driven.com.br/api/v5/cineflex/seats/book-many',
 				newSelectedMovie.seats
 			);
+			setLink('/sucesso');
 
-			finish.then(navigate('/finish_order'));
+			finish.then(navigate('/sucesso'));
 
 			finish.catch((err) => console.log(err.response.data));
 		} else {
@@ -149,8 +151,8 @@ export default function SelectSeat({ selectedMovie, setSelectedMovie }) {
 		newBuyers.forEach((e) => {
 			if (e.idAssento === id) {
 				e.cpf = value
-					.replace(/\D/g, '') // substitui qualquer caracter que nao seja numero por nada
-					.replace(/(\d{3})(\d)/, '$1.$2') // captura 2 grupos de numero o primeiro de 3 e o segundo de 1, apos capturar o primeiro grupo ele adiciona um ponto antes do segundo grupo de numero
+					.replace(/\D/g, '')
+					.replace(/(\d{3})(\d)/, '$1.$2')
 					.replace(/(\d{3})(\d)/, '$1.$2')
 					.replace(/(\d{3})(\d{1,2})/, '$1-$2')
 					.replace(/(-\d{2})\d+?$/, '$1');
@@ -210,7 +212,7 @@ export default function SelectSeat({ selectedMovie, setSelectedMovie }) {
 						<input
 							id={`cpf${index}`}
 							type="text"
-							placeholder="Digite seu CPF..."
+							placeholder="Digite seu CPF (apenas números)..."
 							pattern="(\d{3}\.?\d{3}\.?\d{3}-?\d{2})|(\d{2}\.?\d{3}\.?\d{3}/?\d{4}-?\d{2})"
 							value={buyers[index].cpf}
 							onChange={(e) => addCPF(e.target.value, id)}

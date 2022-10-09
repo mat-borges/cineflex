@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import Loading from '../components/Loading';
 import PageFooter from '../components/PageFooter';
 
-export default function SelectTime({ selectedMovie, setSelectedMovie }) {
+export default function SelectTime({ selectedMovie, setSelectedMovie, setLink }) {
 	const { movieID } = useParams();
 	const [timesList, setTimesList] = useState([]);
 	const [movie, setMovie] = useState({});
@@ -22,6 +22,7 @@ export default function SelectTime({ selectedMovie, setSelectedMovie }) {
 			setSelectedMovie(newSelectedMovie);
 			setTimesList(promise.data.days);
 			setMovie(promise.data);
+			setLink(`/`);
 		});
 
 		request.catch((erro) => {
@@ -39,6 +40,7 @@ export default function SelectTime({ selectedMovie, setSelectedMovie }) {
 		newSelectedMovie.day.date = day.date;
 		newSelectedMovie.day.time = time.name;
 		setSelectedMovie(newSelectedMovie);
+		setLink(`/sessoes/${movieID}`);
 	}
 
 	return (
@@ -53,7 +55,7 @@ export default function SelectTime({ selectedMovie, setSelectedMovie }) {
 						</h2>
 						<TimesList>
 							{timesList[i].showtimes.map((time) => (
-								<Link to={`/assentos/${time.id}`} key={time.id}>
+								<Link to={`/assentos/${movieID}/${time.id}`} key={time.id}>
 									<li onClick={() => chooseTime(day, time)} data-identifier="hour-minute-btn">
 										{time.name}
 									</li>
