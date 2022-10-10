@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
-export default function FinishOrder({ selectedMovie, setSelectedMovie, setLink }) {
+export default function FinishOrder({ setSelectedMovie }) {
 	function resetSelectedMovie() {
 		setSelectedMovie({
 			movie: { title: '', posterURL: '' },
@@ -11,20 +11,22 @@ export default function FinishOrder({ selectedMovie, setSelectedMovie, setLink }
 		});
 	}
 
+	const data = JSON.parse(localStorage.getItem('finished'));
+
 	return (
 		<FinishOrderBox>
 			<h1>Pedido feito com sucesso!</h1>
 			<TicketsSummary>
 				<h2>Filmes e sessões</h2>
-				<p data-identifier="movie-session-infos-reserve-finished">{selectedMovie.movie.title}</p>
+				<p data-identifier="movie-session-infos-reserve-finished">{data.movie.title}</p>
 				<p data-identifier="movie-session-infos-reserve-finished">
-					{selectedMovie.day.date} {selectedMovie.day.time}
+					{data.day.date} {data.day.time}
 				</p>
 				<h2>Ingressos</h2>
-				{selectedMovie.seats.compradores.map((e, i) => (
+				{data.seats.compradores.map((e, i) => (
 					<div key={e.idAssento}>
 						<p key={i} data-identifier="seat-infos-reserve-finished">
-							Assento {selectedMovie.seatsName[i]}
+							Assento {data.seatsName[i]}
 						</p>
 						<p data-identifier="buyer-infos-reserve-finished">Nome: {e.nome}</p>
 						<p data-identifier="buyer-infos-reserve-finished">CPF: {e.cpf}</p>

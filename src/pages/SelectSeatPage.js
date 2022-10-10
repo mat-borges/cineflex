@@ -32,10 +32,11 @@ export default function SelectSeat({ selectedMovie, setSelectedMovie, setLink })
 			setLink(`/sessoes/${movieID}`);
 		});
 
-		request.catch((erro) => {
-			console.log(erro.response.data);
+		request.catch((err) => {
+			console.log('message:', err.message);
+			console.log('name:', err.name);
 		});
-	}, [timeID]);
+	}, [timeID, movieID]);
 
 	if (seatsList.length === 0) {
 		return <Loading />;
@@ -55,6 +56,7 @@ export default function SelectSeat({ selectedMovie, setSelectedMovie, setLink })
 				newSelectedMovie.seats
 			);
 			setLink('/sucesso');
+			localStorage.setItem('finished', JSON.stringify(newSelectedMovie));
 
 			finish.then(navigate('/sucesso'));
 
@@ -155,7 +157,7 @@ export default function SelectSeat({ selectedMovie, setSelectedMovie, setLink })
 					.replace(/(\d{3})(\d)/, '$1.$2')
 					.replace(/(\d{3})(\d)/, '$1.$2')
 					.replace(/(\d{3})(\d{1,2})/, '$1-$2')
-					.replace(/(-\d{2})\d+?$/, '$1');
+					.replace(/(-\d{2})\d+$/, '$1');
 			}
 		});
 

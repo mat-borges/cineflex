@@ -52,16 +52,7 @@ export default function App() {
 						/>
 					}
 				/>
-				<Route
-					path="/sucesso"
-					element={
-						<FinishOrderPage
-							selectedMovie={selectedMovie}
-							setSelectedMovie={setSelectedMovie}
-							setLink={setLink}
-						/>
-					}
-				/>
+				<Route path="/sucesso" element={<FinishOrderPage setSelectedMovie={setSelectedMovie} />} />
 			</Routes>
 		</BrowserRouter>
 	);
