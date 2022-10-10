@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import backIcon from '../assets/arrow-back-outline.png';
 
-export default function MainHeader({ link }) {
+export default function MainHeader({ link, setSelectedMovie }) {
 	const navigate = useNavigate();
 
 	function showIcon() {
@@ -13,10 +13,20 @@ export default function MainHeader({ link }) {
 		}
 	}
 
+	function resetSelectedMovie() {
+		setSelectedMovie({
+			movie: { title: '', posterURL: '' },
+			day: { weekday: '', date: '', time: '' },
+			seats: { ids: [], compradores: [{ idAssento: '', nome: '', cpf: '' }] },
+			seatsName: [],
+		});
+		navigate('/');
+	}
+
 	return (
-		<MainHeaderBox>
+		<MainHeaderBox link={link}>
 			{showIcon()}
-			<div>CINEFLIX</div>
+			<span onClick={link !== '' ? resetSelectedMovie : null}>CINEFLIX</span>
 		</MainHeaderBox>
 	);
 }
@@ -36,13 +46,14 @@ const MainHeaderBox = styled.div`
 	font-size: 34px;
 	text-align: center;
 	letter-spacing: 2px;
-	div {
-		width: 100%;
-		height: 100%;
+	span {
+		width: fit-content;
+		height: fit-content;
 		position: relative;
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		cursor: ${({ link }) => (link !== '' ? 'pointer' : 'default')};
 	}
 `;
 

@@ -19,7 +19,7 @@ export default function App() {
 	return (
 		<BrowserRouter>
 			<GlobalStyle />
-			<MainHeader link={link} />
+			<MainHeader link={link} setSelectedMovie={setSelectedMovie} />
 
 			<Routes>
 				<Route
